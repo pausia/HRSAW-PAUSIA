@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import '~flowbite/css/flowbite.css';
+
+
+[x-cloak] {
+    display: none;
+}
