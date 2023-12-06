@@ -9,6 +9,12 @@ class Matriks extends Model
 {
     use HasFactory;
     protected $table = 'saw_evaluations';
+    protected $fillable = [
+        'user_id',
+        'id_alternative',
+        'id_criteria',
+        'value',
+    ];
     public function alternative()
     {
         return $this->belongsTo(Alternatif::class, 'id_alternative');

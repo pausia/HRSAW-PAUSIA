@@ -28,6 +28,11 @@
                         {{ __('Matriks') }}
                     </x-nav-link>
                 </div>
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link href="{{ route('user.result') }}" :active="request()->routeIs('user.result')">
+                        {{ __('Hasil Kandidat') }}
+                    </x-nav-link>
+                </div>
             </div>
             <!-- Navigation Links -->
 

@@ -5,6 +5,7 @@ use App\Http\Controllers\BobotController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MatriksController;
+use App\Http\Controllers\ResultController;
 use App\Models\Matriks;
 use Illuminate\Support\Facades\Route;
 
@@ -60,3 +61,11 @@ Route::post('matriks/add', [MatriksController::class, 'storeMatriks'])->name('ma
 Route::delete('/matriks/{id}', [MatriksController::class, 'deleteMatriks'])->name('matriks.delete');
 Route::get('/matriks/edit/{id}', [MatriksController::class, 'updateMatriks'])->name('matriks.update');
 Route::post('/matriks/edit/{id}', [BobotController::class, 'editMatriks'])->name('matriks.edit');
+
+
+Route::get('/user/result', [ResultController::class, 'tampilResult'])->name('user.result');
+Route::get('/perform-saw', 'ResultController@performSAW');
+
+
+
+
