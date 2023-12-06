@@ -13,4 +13,16 @@ class Matriks extends Model
     {
         return $this->belongsTo(Alternatif::class, 'id_alternative');
     }
+
+    // Relasi dengan Criterias
+    public function criteria()
+    {
+        return $this->belongsTo(Bobot::class, 'id_criteria');
+    }
+
+    // Relasi dengan User
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

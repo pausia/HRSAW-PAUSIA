@@ -82,7 +82,7 @@
 {{-- ----------------------Hero 1------------------------------------- --}}
 
 <section class="text-gray-600 body-font">
-    <div class="container px-5 py-24 text-center mx-auto">
+    <div class="container px-5 py-24 text-start mx-auto">
       <div class="flex flex-col text-center w-full mb-20">
         <h2 class="text-xl font-sans text-gray-600 tracking-widest font-medium title-font mb-1">HOW WE WORK</h2>
         <h1 class="sm:text-5xl font-sans text-2xl font-medium title-font mb-4 text-gray-900">Why choose us for your business convenience</h1>
@@ -149,8 +149,8 @@
               <div class="p-4 lg:w-4/6">
                 <h1 class="title-font sm:text-4xl text-2xl font-medium text-white mb-5">Look for employee opportunities by calculating using the right method</h1>
                 <p class="max-w-2xl mb-6 font-light text-gray-100 leading-relaxed lg:mb-6 md:text-lg lg:text-xl dark:text-gray-400">Start registering to get your best employees</p>
-                <a href="#" class="w-full md:w-auto inline-flex items-center justify-center px-5 py-3 mr-3 text-base font-medium text-center text-indigo-700 rounded-full bg-white hover:bg-primary-800 focus:ring-4 focus:ring-gray-500 dark:focus:ring-indigo-700">
-                    Start With Us
+                <a href="#" class="w-full md:w-auto inline-flex items-center justify-center px-5 py-3 mr-3 text-base font-medium text-center text-indigo-700 hover:text-gray-50 rounded-full bg-white hover:bg-gray-900 focus:ring-4 focus:ring-gray-500 dark:focus:ring-indigo-700">
+                  Sign Up For Free
                 </a>
               </div>
               <div class="p-4 lg:w-2/6">

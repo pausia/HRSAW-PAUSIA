@@ -13,5 +13,10 @@ class Bobot extends Model
         'criteria',
         'weight',
         'attribute',
+        'user_id',
     ];
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

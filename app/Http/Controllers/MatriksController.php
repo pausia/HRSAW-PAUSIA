@@ -9,49 +9,60 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Database\QueryException;
-
+use Illuminate\Support\Facades\Auth;
 
 class MatriksController extends Controller
 {
     public function tampilMatriks()
-    {
-        $bobot_kriteria = Bobot::all();
-        $alternative = Alternatif::all();
-        $matriks = [];
+{
+    $bobot_kriteria = Bobot::all();
+    $user_id = Auth::id();
+    $bobot_kriteria = Bobot::where('user_id', $user_id)->get();
+    $alternative = Alternatif::where('user_id', $user_id)->get();
+    $matriks = [];
 
-        foreach ($alternative as $alternatif) {
-            $row = [
-                'alternative' => $alternatif->name,
-            ];
-
-            foreach ($bobot_kriteria as $criteria) {
-                $evaluation = DB::table('saw_evaluations')
-                    ->where('id_alternative', $alternatif->id)
-                    ->where('id_criteria', $criteria->id)
-                    ->first();
-
-                // Menambahkan nilai kriteria ke dalam matriks
-                $row['c' . $criteria['id']] = $evaluation ? $evaluation->value : null;
-            }
-
-            // Menambahkan baris ke dalam matriks
-            $matriks[] = $row;
-        }
-
-        // Menambahkan kriteria yang belum memiliki nilai
-        foreach ($bobot_kriteria as $criteria) {
-            $kriteriaKey = 'c' . $criteria->id;
-
-            // Jika kriteria belum ada dalam matriks, tambahkan dengan nilai null
-            if (!array_key_exists($kriteriaKey, $matriks[0])) {
-                foreach ($matriks as &$row) {
-                    $row[$kriteriaKey] = null;
-                }
-            }
-        }
-
-        return view('user.matriks', compact('matriks', 'bobot_kriteria', 'alternative'));
+    if ($bobot_kriteria->isEmpty()) {
+        return view('user.emptymatriks', compact('matriks', 'bobot_kriteria', 'alternative')); // Sesuaikan dengan nama view halaman empty
     }
+
+    // Menambahkan kriteria yang belum memiliki nilai
+    foreach ($bobot_kriteria as $criteria) {
+        $kriteriaKey = 'c' . $criteria->id;
+
+        // Jika kriteria belum ada dalam matriks, tambahkan dengan nilai null
+        if (!empty($matriks) && !array_key_exists($kriteriaKey, $matriks[0])) {
+            foreach ($matriks as &$row) {
+                $row[$kriteriaKey] = null;
+            }
+        }
+    }
+
+    if ($alternative->isEmpty()) {
+        return view('user.emptymatriks',compact('matriks', 'bobot_kriteria', 'alternative')); // Sesuaikan dengan nama view halaman empty
+    }
+
+    foreach ($alternative as $alternatif) {
+        $row = [
+            'alternative' => $alternatif->name,
+        ];
+
+        foreach ($bobot_kriteria as $criteria) {
+            $evaluation = DB::table('saw_evaluations')
+                ->where('id_alternative', $alternatif->id)
+                ->where('id_criteria', $criteria->id)
+                ->first();
+
+            // Menambahkan nilai kriteria ke dalam matriks
+            $row['c' . $criteria->id] = $evaluation ? $evaluation->value : null;
+        }
+
+        // Menambahkan baris ke dalam matriks
+        $matriks[] = $row;
+    }
+
+    return view('user.matriks', compact('matriks', 'bobot_kriteria', 'alternative'));
+}
+
     public function storeMatriks(Request $request)
     {
         try {
@@ -67,6 +78,7 @@ class MatriksController extends Controller
                 'id_alternative' => $request->id_alternative,
                 'id_criteria' => $request->id_criteria,
                 'value' => $request->value,
+                'user_id' => Auth::id(),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

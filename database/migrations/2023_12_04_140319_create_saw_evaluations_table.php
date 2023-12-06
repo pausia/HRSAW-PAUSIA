@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('saw_evaluations', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('id_alternative');
             $table->unsignedBigInteger('id_criteria');
             $table->foreign('id_alternative')->references('id')->on('saw_alternatives')->onDelete('cascade');

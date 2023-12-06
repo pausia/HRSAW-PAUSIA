@@ -4,13 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Alternatif;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class AlternatifController extends Controller
 {
     public function tampilAlternatif()
     {
-        $alternatives = Alternatif::paginate(10);
+        $alternatives = Alternatif::where('user_id', Auth::id())->paginate(10);
+        if ($alternatives->isEmpty()) {
+            return view('user.emptyalternatif'); // Sesuaikan dengan nama view halaman empty
+        }
         return view('user.alternatif', compact('alternatives'));
     }    
 
@@ -25,6 +29,7 @@ class AlternatifController extends Controller
         // Simpan data ke dalam tabel
         Alternatif::create([
             'name' => $request->input('name'),
+            'user_id' => Auth::id(), 
             // Tambahkan kolom lain sesuai kebutuhan
         ]);
 

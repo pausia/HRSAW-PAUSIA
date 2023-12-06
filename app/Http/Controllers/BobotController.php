@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Bobot;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
 
 
@@ -11,7 +12,10 @@ class BobotController extends Controller
 {
     public function tampilBobot()
     {
-        $bobot_kriteria = Bobot::paginate(10); 
+        $bobot_kriteria = Bobot::where('user_id', Auth::id())->paginate(10);
+        if ($bobot_kriteria->isEmpty()) {
+            return view('user.emptybobot'); // Sesuaikan dengan nama view halaman empty
+        }
         return view('user.bobot', compact('bobot_kriteria'));
     }
 
@@ -27,6 +31,7 @@ class BobotController extends Controller
             'criteria' => $request->input('criteria'),
             'weight' => $request->input('weight'),
             'attribute' => $request->input('attribute'),
+            'user_id' => Auth::id(),
         ]);
 
         Alert::success('Berhasil Menambahkan Alternatif', 'Kita sudah menambahkan alternatif baru di tabel');
