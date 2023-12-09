@@ -9,7 +9,11 @@
             <div class="container mx-auto md:p-14 justify-between p-5 bg-indigo-700 rounded-3xl">
                 <div class="flex flex-wrap -m-4 items-center">
                   <div class="p-4 lg:w-4/6">
-                    <h1 class="title-font sm:text-5xl leading-10 text-2xl font-bold text-white">Congratulations to <span class="text-orange-400 leading-10"> Yulia Citra </span></h1>
+                    <h1 class="title-font sm:text-5xl leading-10 text-2xl font-bold text-white">Congratulations to <span class="text-orange-400 leading-10">     @if($results->isNotEmpty() && $results->first()->alternative)
+                        {{ $results->first()->alternative->name }}
+                    @else
+                        Nama Alternatif Default
+                    @endif </span></h1>
                     <p class="max-w-2xl mt-6 font-light text-gray-100 leading-relaxed lg:mb-6 md:text-lg lg:text-xl dark:text-gray-400">Through calculations that we have conducted, the candidate is deemed the best in calculations using the Simple Additive Weighting (SAW) method. This decision is based on a comprehensive evaluation compared to other candidates.</p>
                   </div>
                   <div class="p-4 lg:w-2/6">

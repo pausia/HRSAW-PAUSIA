@@ -9,79 +9,73 @@ use App\Models\Bobot;
 use App\Models\Alternatif;
 use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
+use Illuminate\Support\Facades\DB;
 
 class ResultController extends Controller
 {
     public function tampilResult()
     {
-        // Calculate ranking and save to saw_alternatives_results
         $this->calculateAndSaveRanking();
-
-        // Retrieve data from the saw_alternatives_results table
-        $results = SawAlternativeResult::where('user_id', Auth::id())->get();
-
-        // Assuming you have a blade view file at resources/views/user/result.blade.php
+        $results = SawAlternativeResult::with('alternative')
+        ->where('user_id', Auth::id())
+        ->orderBy('ranking', 'asc')
+        ->get();
         return view('user.result', compact('results'));
     }
 
     private function calculateAndSaveRanking()
-    {
-        $user_id = Auth::id();
+{
+    $user_id = Auth::id();
 
-        // Retrieve criteria weights from the database
-        $criteriaWeights = Bobot::where('user_id', $user_id)->pluck('weight', 'criteria');
+    // Hapus hasil perhitungan sebelumnya
+    SawAlternativeResult::where('user_id', $user_id)->delete();
 
-        // Retrieve data from the matriks table
-        $matriks = Matriks::where('user_id', $user_id)->get();
+    // Ambil semua bobot kriteria
+    $bobot_kriteria = Bobot::where('user_id', $user_id)->get();
 
-        $alternatives = $matriks->groupBy('id_alternative');
+    // Ambil semua alternatif
+    $alternatives = Alternatif::where('user_id', $user_id)->get();
 
-        // Calculate total value for each alternative
-        foreach ($alternatives as $alternativeId => $alternativeEvaluations) {
-            $totalValue = 0;
+    // Lakukan perhitungan total nilai untuk setiap alternatif
+    foreach ($alternatives as $alternative) {
+        $total_value = 0;
 
-            foreach ($alternativeEvaluations as $evaluation) {
-                $criteriaId = $evaluation->id_criteria;
+        foreach ($bobot_kriteria as $criteria) {
+            $evaluation = Matriks::where('user_id', $user_id)
+                ->where('id_alternative', $alternative->id)
+                ->where('id_criteria', $criteria->id)
+                ->first();
 
-            // Periksa apakah kunci ada di dalam array
-            if (isset($criteriaWeights[$criteriaId])) {
-                $normalizedValue = $evaluation->attribute == 'benefit' ?
-                    $evaluation->value / $this->getMaxValue($criteriaId) :
-                    $this->getMinValue($criteriaId) / $evaluation->value;
+            // Hitung total nilai berdasarkan bobot, nilai kriteria, dan atribut "benefit" atau "cost"
+            $weighted_value = $criteria->weight * $evaluation->value;
 
-                $totalValue += $normalizedValue * $criteriaWeights[$criteriaId];
+            if ($criteria->attribute == 'cost') {
+                // Jika atribut adalah "cost", kurangkan nilai dari total
+                $total_value -= $weighted_value;
             } else {
-                // Handle jika kunci tidak ditemukan
-                // Misalnya, dapat menampilkan pesan kesalahan atau mengabaikan nilai tersebut
-                // atau menetapkan nilai default
-                // $totalValue += 0; // atau nilai default lainnya
+                // Jika atribut adalah "benefit" atau tidak ditentukan, tambahkan nilai ke total
+                $total_value += $weighted_value;
             }
-            }
-
-            // Save the result to the saw_alternatives_results table
-            SawAlternativeResult::updateOrCreate(
-                [
-                    'user_id' => $user_id,
-                    'id_alternative' => $alternativeId,
-                ],
-                [
-                    'total_value' => $totalValue,
-                ]
-            );
         }
+
+        // Simpan hasil perhitungan total nilai ke dalam tabel saw_alternatives_results
+        SawAlternativeResult::create([
+            'user_id' => $user_id,
+            'id_alternative' => $alternative->id,
+            'total_value' => $total_value,
+        ]);
     }
 
-    private function getMaxValue($criteriaId)
-    {
-        // Implement logic to retrieve the maximum value for a specific criteria
-        // You may need to query your database or use predefined values
-        return 100; // Replace with actual logic
-    }
+    // Hitung peringkat
+    DB::update("
+        UPDATE saw_alternatives_results r
+        JOIN (
+            SELECT id, RANK() OVER (ORDER BY total_value DESC) as ranking
+            FROM saw_alternatives_results
+            WHERE user_id = $user_id
+        ) ranks ON r.id = ranks.id
+        SET r.ranking = ranks.ranking
+    ");
+}
 
-    private function getMinValue($criteriaId)
-    {
-        // Implement logic to retrieve the minimum value for a specific criteria
-        // You may need to query your database or use predefined values
-        return 0; // Replace with actual logic
-    }
 }
