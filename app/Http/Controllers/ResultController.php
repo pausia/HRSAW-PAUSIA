@@ -38,7 +38,7 @@ class ResultController extends Controller
 
     // Lakukan perhitungan total nilai untuk setiap alternatif
     foreach ($alternatives as $alternative) {
-        $total_value = 0;
+        $total_value = 0.0;
 
         foreach ($bobot_kriteria as $criteria) {
             $evaluation = Matriks::where('user_id', $user_id)
@@ -62,7 +62,7 @@ class ResultController extends Controller
         SawAlternativeResult::create([
             'user_id' => $user_id,
             'id_alternative' => $alternative->id,
-            'total_value' => $total_value,
+            'total_value' =>  number_format($total_value / 100, 2),
         ]);
     }
 
